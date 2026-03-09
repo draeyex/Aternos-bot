@@ -49,7 +49,7 @@ function createBot() {
     host: "forcesmp.qzz.io",
     version: false,
     username: "lvnger",
-    port: 20039,
+    port: 25565,
   });
 
   let hasAuthenticated = false;
