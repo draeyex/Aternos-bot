@@ -41,14 +41,14 @@ app.listen(PORT, "0.0.0.0", () => {
 });
 
 // U CAN ONLY EDIT THIS SECTION!!
-const BOT_PASSWORD = "boad112022";
+const BOT_PASSWORD = "boqad112022";
 
 function createBot() {
   console.log("Attempting to connect to Minecraft server...");
   const bot = mineflayer.createBot({
     host: "forcesmp.qzz.io",
     version: false,
-    username: "ovnger",
+    username: "lvnger",
     port: 20039,
   });
 
