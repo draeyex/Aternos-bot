@@ -46,10 +46,10 @@ const BOT_PASSWORD = "boqad112022";
 function createBot() {
   console.log("Attempting to connect to Minecraft server...");
   const bot = mineflayer.createBot({
-    host: "forcesmp.qzz.io",
+    host: "force_smp.aternos.me",
     version: false,
     username: "lvnger",
-    port: 25565,
+    port: 20039,
   });
 
   let hasAuthenticated = false;
