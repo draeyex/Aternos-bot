@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForceSMP Bot Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0f1a;
+            --card-bg: #0d1424;
+            --border: #1a2540;
+            --accent: #00e5ff;
+            --text: #c8d8f0;
+            --muted: #4a6080;
+            --online: #00ff9d;
+            --offline: #ff4d4d;
+            --panel: #0f1a2e;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 28px 24px 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .bot-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--online);
+            box-shadow: 0 0 8px var(--online);
+            animation: blink 2s ease-in-out infinite;
+            flex-shrink: 0;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .dot.offline {
+            background: var(--offline);
+            box-shadow: 0 0 8px var(--offline);
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--online); }
+            50%       { opacity: 0.4; box-shadow: 0 0 16px var(--online); }
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 8px;
+            transition: border-color 0.2s;
+        }
+
+        .card:hover { border-color: rgba(0,229,255,0.3); }
+
+        .card-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .card-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.15em;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .card-value.green  { color: var(--online); }
+        .card-value.white  { color: #e0eeff; }
+        .card-value.red    { color: var(--offline); }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* refresh progress bar */
+        .refresh-bar {
+            height: 2px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 4px 0 14px;
+            overflow: hidden;
+        }
+
+        .refresh-progress {
+            height: 100%;
+            background: var(--accent);
+            animation: shrink 3s linear infinite;
+            transform-origin: left;
+        }
+
+        @keyframes shrink {
+            from { transform: scaleX(1); }
+            to   { transform: scaleX(0); }
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72em;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 4px 0 8px;
+            padding-left: 4px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .feature-item {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 0.85em;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .feature-item:hover {
+            border-color: rgba(0,229,255,0.25);
+            background: rgba(0,229,255,0.03);
+        }
+
+        .discord-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #5865F2;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 14px;
+            border: 1px solid rgba(88,101,242,0.5);
+            transition: all 0.2s;
+        }
+
+        .discord-btn:hover {
+            background: #4752C4;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(88,101,242,0.3);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72em;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+
+        .footer span { color: var(--accent); }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="bot-title">
+            <div class="dot" id="headerDot"></div>
+            AFK BOT
+        </div>
+    </div>
+
+    <!-- Status -->
+    <div class="card">
+        <div class="card-label">Status</div>
+        <div class="status-row">
+            <div class="dot" id="statusDot"></div>
+            <div class="card-value green" id="statusText">Connecting...</div>
+        </div>
+    </div>
+
+    <!-- Uptime -->
+    <div class="card">
+        <div class="card-label">Uptime</div>
+        <div class="card-value white" id="uptime">0h 0m 0s</div>
+    </div>
+
+    <!-- Coordinates (REAL from bot) -->
+    <div class="card">
+        <div class="card-label">Coordinates</div>
+        <div class="card-value white" id="coords">Loading...</div>
+    </div>
+
+    <!-- Server -->
+    <div class="card">
+        <div class="card-label">Server</div>
+        <div class="card-value">forcesmp.qzz.io</div>
+    </div>
+
+    <!-- Refresh bar -->
+    <div class="refresh-bar"><div class="refresh-progress"></div></div>
+
+    <!-- Features -->
+    <div class="section-title">Active Features</div>
+    <div class="feature-grid">
+        <div class="feature-item">🪓 Wood Chopping</div>
+        <div class="feature-item">🏠 Building Houses</div>
+        <div class="feature-item">🌱 Tree Replanting</div>
+        <div class="feature-item">🔐 Auto Login</div>
+        <div class="feature-item">💬 Smart Chat</div>
+        <div class="feature-item">👋 Greets Players</div>
+        <div class="feature-item">⚡ Auto Respawn</div>
+        <div class="feature-item">🔄 Auto Reconnect</div>
+    </div>
+
+    <!-- Discord -->
+    <a href="https://discord.gg/a9GCg7SA" class="discord-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.04.032.052a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+        </svg>
+        JOIN DISCORD
+    </a>
+
+    <div class="footer">
+        <p>by <span>DRAEYEX</span> &nbsp;•&nbsp; ForceSMP Bot v1.0</p>
+    </div>
+
+</div>
+
+<script>
+    async function fetchStatus() {
+        try {
+            const res = await fetch('/status');
+            const data = await res.json();
+
+            // Online / Offline
+            const dots = [document.getElementById('headerDot'), document.getElementById('statusDot')];
+            const statusText = document.getElementById('statusText');
+
+            if (data.online) {
+                dots.forEach(d => d.classList.remove('offline'));
+                statusText.textContent = 'Online & Running';
+                statusText.className = 'card-value green';
+            } else {
+                dots.forEach(d => d.classList.add('offline'));
+                statusText.textContent = 'Reconnecting...';
+                statusText.className = 'card-value red';
+            }
+
+            // Real coordinates from bot
+            const c = data.coords;
+            document.getElementById('coords').textContent =
+                `X: ${c.x}  Y: ${c.y}  Z: ${c.z}`;
+
+            // Uptime from server start
+            const s = data.uptime;
+            const h = Math.floor(s / 3600);
+            const m = Math.floor((s % 3600) / 60);
+            const sec = s % 60;
+            document.getElementById('uptime').textContent = `${h}h ${m}m ${sec}s`;
+
+        } catch (e) {
+            document.getElementById('statusText').textContent = 'Offline';
+            document.getElementById('statusText').className = 'card-value red';
+            document.getElementById('coords').textContent = 'N/A';
+        }
+    }
+
+    fetchStatus();
+    setInterval(fetchStatus, 3000); // Update every 3 seconds
+</script>
+</body>
+</html>
