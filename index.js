@@ -46,7 +46,7 @@ const BOT_PASSWORD = "boqad112022";
 function createBot() {
   console.log("Attempting to connect to Minecraft server...");
   const bot = mineflayer.createBot({
-    host: "force_smp.aternos.me",
+    host: "mudminnow.aternos.host",
     version: false,
     username: "lvnger",
     port: 20039,
